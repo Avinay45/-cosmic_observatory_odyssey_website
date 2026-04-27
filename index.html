@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html class="dark" lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>STELLARIS | Aerospace Data Archive</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&amp;family=Outfit:wght@300;400;500;600&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400&amp;family=Space+Grotesk:wght@300;400;700&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#b1c5ff",
+                        "primary-container": "#1b6cf2",
+                        "background": "#03020A",
+                        "surface": "#11131b",
+                        "on-background": "#e1e2ed",
+                        "on-surface-variant": "#c2c6d7",
+                    },
+                    spacing: {
+                        "section": "160px",
+                        "gutter": "24px",
+                        "margin-page": "64px",
+                    },
+                    fontFamily: {
+                        "headline": ["Orbitron", "sans-serif"],
+                        "body": ["Outfit", "sans-serif"],
+                        "mono": ["Space Mono", "monospace"],
+                    },
+                    transitionTimingFunction: {
+                        "spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body selection:bg-primary-container selection:text-white">
+<!-- NOISE FILTER -->
+<svg class="noise-overlay">
+<filter id="noiseFilter">
+<feturbulence basefrequency="0.6" numoctaves="3" stitchtiles="stitch" type="fractalNoise"></feturbulence>
+</filter>
+<rect filter="url(#noiseFilter)" height="100%" width="100%"></rect>
+</svg>
+<!-- CUSTOM CURSOR -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<!-- NAVIGATION -->
+<header class="fixed top-0 w-full flex justify-between items-center px-12 h-24 glass-premium z-50 border-b border-white/5">
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="relative w-12 h-12 flex items-center justify-center">
+<div class="absolute inset-0 border border-primary/30 rounded-full animate-[spin_10s_linear_infinite]"></div>
+<div class="w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_rgba(177,197,255,0.8)]"></div>
+</div>
+<span class="text-2xl font-headline font-black tracking-tighter text-white">STELLARIS</span>
+</div>
+<nav class="hidden lg:flex items-center gap-12 font-mono text-[11px] uppercase tracking-[0.3em] font-bold">
+<a class="text-white hover:text-primary transition-colors duration-500" href="#stats">Stats</a>
+<a class="text-white/40 hover:text-primary transition-colors duration-500" href="#galaxies">Galaxies</a>
+<a class="text-white/40 hover:text-primary transition-colors duration-500" href="#map">Map</a>
+<a class="text-white/40 hover:text-primary transition-colors duration-500" href="#timeline">Timeline</a>
+<a class="text-white/40 hover:text-primary transition-colors duration-500" href="#contact">Contact</a>
+</nav>
+<div class="flex items-center gap-4 lg:gap-8">
+<div class="hidden lg:block magnetic-wrap">
+<button class="action-btn px-8 py-3 border border-white/10 text-white font-mono text-[10px] tracking-[0.3em] uppercase hover:bg-white hover:text-black transition-all duration-500 glass-premium" data-action="SYSTEM EXPLORATION INITIATED">
+                    Explore Now
+                </button>
+</div>
+<span class="material-symbols-outlined text-white/40 hover:text-white cursor-pointer transition-colors hidden sm:block" data-icon="account_circle">account_circle</span>
+<button id="mobile-menu-btn" class="lg:hidden text-white/80 hover:text-white transition-colors relative z-50">
+    <span class="material-symbols-outlined text-3xl" data-icon="menu" id="menu-icon">menu</span>
+</button>
+</div>
+</header>
+<!-- Mobile Menu Overlay -->
+<div id="mobile-menu" class="fixed inset-0 bg-background/95 backdrop-blur-3xl z-40 lg:hidden flex flex-col items-center justify-center gap-8 opacity-0 pointer-events-none transition-all duration-500 translate-y-8">
+    <a class="mobile-link text-white text-3xl font-headline tracking-widest uppercase hover:text-primary transition-colors" href="#stats">Stats</a>
+    <a class="mobile-link text-white/70 text-3xl font-headline tracking-widest uppercase hover:text-primary transition-colors" href="#galaxies">Galaxies</a>
+    <a class="mobile-link text-white/70 text-3xl font-headline tracking-widest uppercase hover:text-primary transition-colors" href="#map">Map</a>
+    <a class="mobile-link text-white/70 text-3xl font-headline tracking-widest uppercase hover:text-primary transition-colors" href="#timeline">Timeline</a>
+    <a class="mobile-link text-white/70 text-3xl font-headline tracking-widest uppercase hover:text-primary transition-colors" href="#contact">Contact</a>
+</div>
+<main>
+<!-- HERO SECTION -->
+<section class="relative min-h-screen flex items-center justify-center pt-24 overflow-hidden">
+<div class="absolute inset-0 z-0 parallax-bg" data-speed="0.3">
+<img alt="Deep space nebula" class="w-full h-full object-cover opacity-20 scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiK8pyqqjRLfAk0q5PNeuipPr6tu8rmGBFeA-zir4u1C4muv-Ejt-oolsSJY1utPoY0w7HYiRXluQAEfV2yZvjzxs_G-22VEKL0X2UVQWfsD4MyAroGMUhHX10gk9QXAqf1gs1BHTzIJ121KaU6ZHshH-kvqC5UwU0KC5xJxzw2-isFP1RjcvonfAYPvMm5RFDMRmLPOk-y3kLAQYt691EClxKEV_6qBKH4DFTSnY3l7EBJe88R-fLjiq4gGodtY7qt8Dln3IDdYE"/>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background"></div>
+</div>
+<div class="relative z-10 text-center max-w-5xl px-gutter">
+<div class="reveal-up" style="transition-delay: 0.1s">
+<span class="font-mono text-primary text-[10px] tracking-[0.6em] uppercase block mb-8">SYSTEM PROTOCOL: ACTIVE</span>
+</div>
+<h1 class="font-headline text-5xl md:text-8xl text-white mb-10 leading-tight scramble-text" data-text="WE ARE / STARDUST">
+                    WE ARE <span class="text-primary-container">/</span> STARDUST
+                </h1>
+<p class="font-body text-xl md:text-2xl text-on-surface-variant max-w-2xl mx-auto mb-16 reveal-up" style="transition-delay: 0.2s">
+                    Access the most comprehensive aerospace data archive in the known universe. Mapping 2 trillion galaxies across the cosmic horizon.
+                </p>
+<div class="flex flex-col md:flex-row items-center justify-center gap-8 reveal-up" style="transition-delay: 0.3s">
+<div class="magnetic-wrap">
+<button class="action-btn px-14 py-6 bg-primary-container text-white font-headline text-sm tracking-widest uppercase hover:scale-105 transition-transform duration-500 shadow-[0_20px_50px_rgba(27,108,242,0.3)]" data-action="CORE INITIALIZATION SUCCESS">
+                            Initialize Core
+                        </button>
+</div>
+<div class="magnetic-wrap">
+<a href="#stats" class="inline-block px-14 py-6 border border-white/10 text-white font-headline text-sm tracking-widest uppercase hover:bg-white/5 transition-all duration-500">
+                            View Telemetry
+                        </a>
+</div>
+</div>
+</div>
+<div class="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 opacity-30 animate-bounce">
+<span class="font-mono text-[9px] uppercase tracking-[0.5em]">Descent</span>
+<div class="w-[1px] h-16 bg-gradient-to-b from-primary to-transparent"></div>
+</div>
+</section>
+<!-- STATS SECTION -->
+<section id="stats" class="py-section container mx-auto px-margin-page">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<!-- Card 1 -->
+<div class="reveal-up tilt-card" style="transition-delay: 0.1s">
+<div class="tilt-inner glass-premium p-12 relative overflow-hidden group">
+<div class="absolute top-8 right-8 font-mono text-primary/10 text-6xl">01</div>
+<h3 class="font-mono text-primary text-[10px] tracking-[0.4em] mb-12 uppercase">OBSERVABLE RADIUS</h3>
+<div class="flex items-baseline gap-4 mb-6">
+<span class="text-7xl font-headline text-white counter" data-target="93">0</span>
+<span class="text-2xl font-headline text-primary">BLY</span>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed">The current estimated diameter of the observable universe from Earth.</p>
+<div class="mt-12 h-px w-full bg-white/10 relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 bg-primary w-2/3 shadow-[0_0_15px_#b1c5ff] transition-transform duration-1000 origin-left scale-x-0 group-hover:scale-x-100"></div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="reveal-up tilt-card" style="transition-delay: 0.2s">
+<div class="tilt-inner glass-premium p-12 relative overflow-hidden group">
+<div class="absolute top-8 right-8 font-mono text-primary/10 text-6xl">02</div>
+<h3 class="font-mono text-primary text-[10px] tracking-[0.4em] mb-12 uppercase">GALAXY DENSITY</h3>
+<div class="flex items-baseline gap-4 mb-6">
+<span class="text-7xl font-headline text-white counter" data-target="2">0</span>
+<span class="text-2xl font-headline text-primary">TRIL</span>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed">Total number of galaxies estimated within the reachable horizon.</p>
+<div class="mt-12 h-px w-full bg-white/10 relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 bg-primary w-1/2 shadow-[0_0_15px_#b1c5ff] transition-transform duration-1000 origin-left scale-x-0 group-hover:scale-x-100"></div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="reveal-up tilt-card" style="transition-delay: 0.3s">
+<div class="tilt-inner glass-premium p-12 relative overflow-hidden group">
+<div class="absolute top-8 right-8 font-mono text-primary/10 text-6xl">03</div>
+<h3 class="font-mono text-primary text-[10px] tracking-[0.4em] mb-12 uppercase">COSMIC TEMP</h3>
+<div class="flex items-baseline gap-4 mb-6">
+<span class="text-7xl font-headline text-white counter" data-target="2.7">0</span>
+<span class="text-2xl font-headline text-primary">KELV</span>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed">Average temperature of cosmic microwave background radiation.</p>
+<div class="mt-12 h-px w-full bg-white/10 relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 bg-primary w-1/4 shadow-[0_0_15px_#b1c5ff] transition-transform duration-1000 origin-left scale-x-0 group-hover:scale-x-100"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- COSMIC MAP SECTION (ORRERY) -->
+<section id="map" class="py-section bg-surface/30">
+<div class="max-w-7xl mx-auto px-margin-page">
+<div class="flex flex-col md:flex-row justify-between items-end gap-12 mb-20 reveal-up">
+<div class="max-w-2xl">
+<h2 class="font-headline text-4xl md:text-6xl text-white uppercase mb-6 scramble-text" data-text="Local Supercluster">Local Supercluster</h2>
+<p class="text-on-surface-variant text-lg">Real-time telemetry of galactic coordinates within the Laniakea filament.</p>
+</div>
+<div class="px-6 py-3 glass-premium flex items-center gap-4">
+<div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+<span class="font-mono text-[10px] uppercase tracking-widest">LGS-01 LIVE STREAM</span>
+</div>
+</div>
+<div class="relative aspect-video rounded-3xl overflow-hidden glass-premium group" id="orrery-container">
+<div class="w-full h-full relative" id="orrery">
+<img alt="Astronomical chart" class="w-[120%] h-[120%] -translate-x-[10%] -translate-y-[10%] object-cover grayscale opacity-40 transition-transform duration-[2s] ease-out pointer-events-none" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_zdrPGBJtLmqKNC7d0Z-KkfdpBaw5bxCx2ioo06CTNrwRnDLBZ6JSthr-gISjkya6ar5uLi4Awm4rWg_QujBruLcPF0NIvua5WECRNY_SQMUcazI16mNGEsKUpXGmDT9YMT2rObApUlD6aGAwgw3vgOWiB5ArY7O5qjMXl_ooWZrj7BMNU3-oEOwRP-ogHAiOhtZj3zXhZtROMaJ42bkvTwOrscxK5eF5E5a4ddPRwjw7etEFA94htmvLrjjuo8wQFmFBTCR36u0"/>
+<!-- HUD OVERLAY -->
+<div class="absolute inset-0 pointer-events-none">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] border border-primary/20 rounded-full"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] border border-primary/10 rounded-full"></div>
+<div class="absolute top-0 bottom-0 left-1/2 w-px bg-white/5"></div>
+<div class="absolute left-0 right-0 top-1/2 h-px bg-white/5"></div>
+</div>
+<!-- INTERACTIVE NODES -->
+<div class="absolute top-[30%] left-[40%] group/node pointer-events-auto cursor-pointer" style="transform: translate(-50%, -50%)">
+<div class="w-3 h-3 bg-white rounded-full group-hover/node:scale-150 transition-transform duration-500 shadow-[0_0_20px_white]"></div>
+<div class="absolute left-6 top-1/2 -translate-y-1/2 whitespace-nowrap opacity-0 group-hover/node:opacity-100 transition-all duration-500 -translate-x-4 group-hover/node:translate-x-0">
+<span class="font-mono text-xs text-white bg-black/80 px-3 py-1 border border-white/20">ANDROMEDA M31</span>
+</div>
+</div>
+<div class="absolute top-[65%] left-[70%] group/node pointer-events-auto cursor-pointer" style="transform: translate(-50%, -50%)">
+<div class="w-2 h-2 bg-primary rounded-full group-hover/node:scale-150 transition-transform duration-500 shadow-[0_0_20px_#b1c5ff]"></div>
+<div class="absolute left-6 top-1/2 -translate-y-1/2 whitespace-nowrap opacity-0 group-hover/node:opacity-100 transition-all duration-500 -translate-x-4 group-hover/node:translate-x-0">
+<span class="font-mono text-xs text-white bg-black/80 px-3 py-1 border border-white/20">TRIANGULUM M33</span>
+</div>
+</div>
+<!-- LIVE TELEMETRY HUD -->
+<div class="absolute top-10 left-10 p-6 glass-premium border-l-4 border-primary">
+<div class="font-mono text-[9px] text-primary tracking-widest mb-2 uppercase">VECTOR SCAN</div>
+<div class="font-mono text-lg text-white" id="vector-readout">X: 284.22 // Y: 119.04</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- HORIZONTAL GALAXIES SECTION -->
+<section id="galaxies" class="py-section overflow-hidden">
+<div class="max-w-7xl mx-auto px-margin-page mb-16 flex justify-between items-end reveal-up">
+<div>
+<h2 class="font-headline text-4xl text-white uppercase tracking-widest scramble-text" data-text="Morphological Classification">Morphological Classification</h2>
+</div>
+<div class="flex gap-4 items-center">
+<span class="font-mono text-[10px] text-white/40">SCROLL TO DRIFT</span>
+<div class="w-48 h-1 bg-white/5 relative">
+<div class="absolute inset-y-0 left-0 bg-primary w-0 transition-all duration-300" id="scroll-progress"></div>
+</div>
+</div>
+</div>
+<div class="horizontal-container px-[calc(50vw-640px)] reveal-up">
+<!-- Galaxy 1 -->
+<div class="min-w-[450px] aspect-[3/4] relative overflow-hidden group rounded-sm tilt-card">
+<div class="tilt-inner w-full h-full">
+<img alt="Spiral Galaxy" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVEntv25uhX707FjXGR_cKKJhdJROPRpc8XlzOamYVwj8tKACj9JDdEWi9hd6n5JnKCqvnnlTsFI4jBTDd16Fo3U4iQaMmheqy77aARlt6b2TOzJF1gD1IuTKouYBV4srdMLp5ggNOoGnuZvrIWzPyfu2Wz5LXyNUsYTJpeUe3LebPNZ6d_76yH773DMgKcO7JfrLSyUIAOwpnYqZ0FKIfqlLtrHDf636_fH_J9Kw60opOgu4JXXQJ2CJPcC5CUxHd0xE4r3RkWYg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80"></div>
+<div class="absolute bottom-0 p-12 w-full">
+<span class="font-mono text-primary text-[10px] mb-4 block uppercase tracking-[0.4em]">Category S-1</span>
+<h3 class="font-headline text-3xl text-white mb-6 uppercase">Spiral</h3>
+<p class="text-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all duration-700 transform translate-y-4 group-hover:translate-y-0">Defining stars, gas, and dust that rotate in a plane around a central bulge.</p>
+<button class="action-btn mt-8 flex items-center gap-3 text-white font-mono text-[10px] tracking-widest hover:text-primary transition-colors" data-action="ARCHIVE S-1 ACCESSED">
+                                VIEW ARCHIVE <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Galaxy 2 -->
+<div class="min-w-[450px] aspect-[3/4] relative overflow-hidden group rounded-sm tilt-card">
+<div class="tilt-inner w-full h-full">
+<img alt="Elliptical Galaxy" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvt9nCu32QGK6NJrDZ5A4M8SKqH0nvG2OqrSrVMWmYf_sdNxvXF3DqfX59KzS4OH-rleE7pxQpwL2Xm6Bdz05uo8zZJCCKa435k5cPvs_UqBQfZskd4jpI8lLw48aP6LamFlhnlIyALvlf3789b0fAC7_S-7BCvz_Y0cLKvPuMP4li4mirNw76EsjjoTAfd7cC11S4JmAu9RHZe-Qt-_grom5gFANvyEulMUSvxJxVmsjM8Y7L6jDMV_9WzjvKYlVqKfdy1Ht1Wrg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80"></div>
+<div class="absolute bottom-0 p-12 w-full">
+<span class="font-mono text-primary text-[10px] mb-4 block uppercase tracking-[0.4em]">Category E-5</span>
+<h3 class="font-headline text-3xl text-white mb-6 uppercase">Elliptical</h3>
+<p class="text-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all duration-700 transform translate-y-4 group-hover:translate-y-0">Smooth, nearly featureless brightness profiles and an elliptical shape.</p>
+<button class="action-btn mt-8 flex items-center gap-3 text-white font-mono text-[10px] tracking-widest hover:text-primary transition-colors" data-action="ARCHIVE E-5 ACCESSED">
+                                VIEW ARCHIVE <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Galaxy 3 -->
+<div class="min-w-[450px] aspect-[3/4] relative overflow-hidden group rounded-sm tilt-card">
+<div class="tilt-inner w-full h-full">
+<img alt="Irregular Galaxy" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2a0sVNo_rcLZ4k6pQvwMdaxeTTAoDqZc-yEQWAtpCmiC5hlzViIoCuP4-s8ZLsravNKWAHhrQNdMSINqsfWsPCubVO9e0YZhiNaJp9EiOZVK5UwHJlO7vjS6GidDvr3d7ynSk1HqA30oHoXjPOFaRR1vAzmSz_aIagKzLwzbmPyI1SYqWxwCRjXbZ3npZB8GFVLqwaUFpAqg-6iBbvf2cZFKwXg-MykCahFODkZxOf7vV61TolYFW8wkmrWLmmhLH1Ynqnu5k-_E"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80"></div>
+<div class="absolute bottom-0 p-12 w-full">
+<span class="font-mono text-primary text-[10px] mb-4 block uppercase tracking-[0.4em]">Category I-9</span>
+<h3 class="font-headline text-3xl text-white mb-6 uppercase">Irregular</h3>
+<p class="text-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-all duration-700 transform translate-y-4 group-hover:translate-y-0">Chaotic appearance, with neither a nuclear bulge nor spiral arm structure.</p>
+<button class="action-btn mt-8 flex items-center gap-3 text-white font-mono text-[10px] tracking-widest hover:text-primary transition-colors" data-action="ARCHIVE I-9 ACCESSED">
+                                VIEW ARCHIVE <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- TIMELINE SECTION -->
+<section id="timeline" class="py-section bg-surface/20">
+<div class="container mx-auto px-margin-page">
+<div class="text-center mb-32 reveal-up">
+<h2 class="font-headline text-5xl text-white uppercase mb-8 scramble-text" data-text="Historical Timeline">Historical Timeline</h2>
+<div class="w-32 h-1.5 bg-primary mx-auto rounded-full shadow-[0_0_20px_#b1c5ff]"></div>
+</div>
+<div class="max-w-4xl mx-auto relative">
+<div class="absolute left-1/2 top-0 bottom-0 w-px bg-white/10 -translate-x-1/2 hidden md:block"></div>
+<!-- Item 1 -->
+<div class="mb-32 relative flex flex-col md:flex-row items-center gap-12 reveal-up">
+<div class="flex-1 md:text-right">
+<div class="inline-block px-6 py-2 glass-premium text-primary font-mono text-xs rounded-full mb-6">1990</div>
+<h4 class="font-headline text-3xl text-white mb-4 uppercase">Hubble Launch</h4>
+<p class="text-on-surface-variant">Deployment of the Hubble Space Telescope via the STS-31 mission, changing our view of the cosmos forever.</p>
+</div>
+<div class="relative z-10 w-6 h-6 bg-primary border-4 border-background rounded-full shadow-[0_0_20px_#b1c5ff]"></div>
+<div class="flex-1">
+<div class="flex items-center gap-4 text-primary">
+<span class="material-symbols-outlined" data-icon="rocket_launch">rocket_launch</span>
+<span class="font-mono text-[10px] tracking-[0.2em] uppercase opacity-60">MISSION STATUS: COMPLETED</span>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="mb-32 relative flex flex-col md:flex-row-reverse items-center gap-12 reveal-up">
+<div class="flex-1 text-left">
+<div class="inline-block px-6 py-2 glass-premium text-primary font-mono text-xs rounded-full mb-6">2003</div>
+<h4 class="font-headline text-3xl text-white mb-4 uppercase">Spitzer Deployment</h4>
+<p class="text-on-surface-variant">The fourth of NASA's Great Observatories, providing high-resolution infrared imagery of the universe.</p>
+</div>
+<div class="relative z-10 w-6 h-6 bg-primary border-4 border-background rounded-full shadow-[0_0_20px_#b1c5ff]"></div>
+<div class="flex-1 md:text-right">
+<div class="flex items-center gap-4 text-primary md:flex-row-reverse">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+<span class="font-mono text-[10px] tracking-[0.2em] uppercase opacity-60">MISSION STATUS: DECOMMISSIONED</span>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="relative flex flex-col md:flex-row items-center gap-12 reveal-up">
+<div class="flex-1 md:text-right">
+<div class="inline-block px-6 py-2 glass-premium text-primary font-mono text-xs rounded-full mb-6">2021</div>
+<h4 class="font-headline text-3xl text-white mb-4 uppercase">JWST Reach L2</h4>
+<p class="text-on-surface-variant">The James Webb Space Telescope arrives at the second Lagrange point, initiating the next era of deep space discovery.</p>
+</div>
+<div class="relative z-10 w-6 h-6 bg-primary border-4 border-background rounded-full animate-pulse shadow-[0_0_20px_#b1c5ff]"></div>
+<div class="flex-1">
+<div class="flex items-center gap-4 text-primary">
+<span class="material-symbols-outlined" data-icon="satellite_alt" style="font-variation-settings: 'FILL' 1;">satellite_alt</span>
+<span class="font-mono text-[10px] tracking-[0.2em] uppercase opacity-60">MISSION STATUS: ACTIVE</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA SECTION -->
+<section id="contact" class="py-section relative overflow-hidden">
+<div class="absolute inset-0 z-0 parallax-bg" data-speed="0.2">
+<img alt="Night sky horizon" class="w-full h-full object-cover opacity-10 grayscale scale-125" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_d4mlieZxkru3N8FlLn-blfyRil9ongeEUcQynPDFo4i2k9i4KFCB_7id8SDLOgOGad8pFpN_Y6ilMZjQosdkPs_FfGjhbPWhd_RddsKiNrf0LgFXjtOy80aUPLce7DON6tne-EfYSH7sIkB7bFBgcHM9F6dAJSzaCe2hZNEJ7XMuu3uLnGN6_jWqIdo8p_cNKMvBuZ2uWaofbzld3BrZ56_5RSMqp-FG9Xq49RQHxugs5Sw_JJXgU3OiyCrh45G07ZzRRF1D5KI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background"></div>
+</div>
+<div class="relative z-10 max-w-4xl mx-auto px-margin-page text-center reveal-up">
+<h2 class="font-headline text-5xl md:text-7xl text-white mb-8 uppercase tracking-tighter scramble-text" data-text="Connect with the Stars">Connect with the Stars</h2>
+<p class="font-body text-xl text-on-surface-variant mb-16 max-w-2xl mx-auto">Receive weekly telemetry reports from our global network of observatories. No data caps. No latency.</p>
+<form id="contact-form" class="flex flex-col sm:flex-row gap-6 justify-center max-w-2xl mx-auto glass-premium p-4 rounded-lg">
+<input required class="bg-transparent border-none px-8 py-4 text-white font-mono focus:ring-0 outline-none flex-grow text-sm placeholder:text-white/20" placeholder="SIGNAL_IDENTIFIER@DOMAIN.COM" type="email"/>
+<div class="magnetic-wrap">
+<button type="submit" class="bg-primary-container text-white px-12 py-4 font-headline text-xs hover:brightness-125 transition-all uppercase tracking-widest flex items-center justify-center gap-3">
+                            Launch <span class="material-symbols-outlined text-sm" data-icon="send">send</span>
+</button>
+</div>
+</form>
+</div>
+</section>
+</main>
+<!-- FOOTER -->
+<footer class="relative overflow-hidden pt-40 pb-20 bg-[#000000]" style="mask-image: linear-gradient(to bottom, transparent 0%, #000000 6%); -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000000 6%);">
+<canvas class="absolute inset-0 w-full h-full" id="footerStars" style="z-index: 0;"></canvas>
+<div class="relative z-10 container mx-auto px-margin-page" style="z-index: 2;">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-24 mb-32">
+<div class="col-span-1 md:col-span-2">
+<div class="flex items-center gap-4 mb-10">
+<span class="text-4xl font-black text-white font-headline tracking-tighter">STELLARIS</span>
+</div>
+<p class="text-on-surface-variant max-w-md mb-12 font-body text-lg leading-relaxed">
+                        Pioneering the archival of cosmic data since the first signal was intercepted. Our mission is to preserve the history of the universe for the next evolution of human intelligence.
+                    </p>
+<div class="flex gap-8">
+<span class="material-symbols-outlined text-white/20 hover:text-primary transition-all cursor-pointer text-3xl" data-icon="public">public</span>
+<span class="material-symbols-outlined text-white/20 hover:text-primary transition-all cursor-pointer text-3xl" data-icon="terminal">terminal</span>
+<span class="material-symbols-outlined text-white/20 hover:text-primary transition-all cursor-pointer text-3xl" data-icon="radar">radar</span>
+</div>
+</div>
+<div>
+<h5 class="font-mono text-primary text-[10px] tracking-[0.5em] mb-12 uppercase">QUICK ACCESS</h5>
+<ul class="flex flex-col gap-6 font-mono text-[11px] text-white/40">
+<li><a class="hover:text-white transition-colors uppercase tracking-widest" href="#">Universe Core</a></li>
+<li><a class="text-primary hover:text-white transition-colors uppercase tracking-widest underline underline-offset-8 decoration-primary/30" href="#">Galactic Map</a></li>
+<li><a class="hover:text-white transition-colors uppercase tracking-widest" href="#">Star Catalog</a></li>
+<li><a class="hover:text-white transition-colors uppercase tracking-widest" href="#">Mission Control</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-mono text-primary text-[10px] tracking-[0.5em] mb-12 uppercase">SYSTEM DATA</h5>
+<ul class="flex flex-col gap-6 font-mono text-[11px] text-white/40">
+<li><a class="hover:text-white transition-colors uppercase tracking-widest" href="#">Privacy Protocol</a></li>
+<li><a class="hover:text-white transition-colors uppercase tracking-widest" href="#">Terms of Orbit</a></li>
+<li><a class="hover:text-white transition-colors uppercase tracking-widest" href="#">Signal Support</a></li>
+</ul>
+</div>
+</div>
+<div class="pt-12 border-t border-white/5 flex flex-col lg:flex-row justify-between items-center gap-12 font-mono text-[10px] uppercase tracking-[0.3em] text-white/20">
+<span>© 2024 STELLARIS AEROSPACE DATA ARCHIVE. ALL TELEMETRY ENCRYPTED.</span>
+<div class="flex gap-16">
+<span class="flex items-center gap-3"><div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div> SYSTEM STABLE</span>
+<span class="flex items-center gap-3"><span class="material-symbols-outlined text-sm" data-icon="lan">lan</span> NODE: ALPHA-09</span>
+</div>
+</div>
+</div>
+</footer>
+<script type="module" src="./main.js"></script>
+</body></html>
